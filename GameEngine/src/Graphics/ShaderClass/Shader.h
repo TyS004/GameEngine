@@ -1,0 +1,29 @@
+#pragma once
+
+#include "Logging/Log.h"
+#include <glad/glad.h>
+
+#include <glm/gtc/type_ptr.hpp>
+
+
+class Shader
+{
+public:
+	GLuint ID;
+	Shader();
+	Shader(const char* vertexFile, const char* fragmentFile);
+
+	std::string getFileContents(const char* fileName);
+
+	void Activate();
+	void Delete();
+
+	void CompileShaders();
+	void handleErrors(GLuint type, const std::string& source, GLuint shaderID);
+
+	void setUniformVar(const glm::mat4& trans);
+
+private:
+	std::string m_vertexSource, m_fragmentSource;
+	GLuint m_program;
+};
