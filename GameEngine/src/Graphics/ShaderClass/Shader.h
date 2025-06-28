@@ -1,15 +1,12 @@
 #pragma once
 
 #include "Logging/Log.h"
-#include <glad/glad.h>
-
-#include <glm/gtc/type_ptr.hpp>
-
 
 class Shader
 {
 public:
 	GLuint ID;
+	
 	Shader();
 	Shader(const char* vertexFile, const char* fragmentFile);
 

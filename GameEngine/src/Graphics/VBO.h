@@ -1,15 +1,11 @@
 #pragma once
 
-#include <glad/glad.h>
+#include "gepch.h"
 
 class VBO
 {
 public:
 	GLuint ID;
-	inline VBO()
-	{
-		ID = 0;
-	}
 	inline VBO(GLfloat* vertices, int size)
 	{
 		glGenBuffers(1, &ID); 

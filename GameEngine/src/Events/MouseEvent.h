@@ -9,6 +9,8 @@ public:
 		: m_type(EventType::MousePressedEvent), m_button(button) {}
 
 	EventType getType() const override { return m_type; }
+	int getButton() const { return m_button; }
+
 	std::string toString() const override
 	{
 		std::stringstream ss;
@@ -30,6 +32,8 @@ public:
 		: m_type(EventType::MouseReleasedEvent), m_button(button) {}
 
 	EventType getType() const override { return m_type; }
+	int getButton() const { return m_button; }
+
 	std::string toString() const override
 	{
 		std::stringstream ss;
@@ -51,6 +55,7 @@ public:
 		: m_type(EventType::MouseScrolledEvent), m_xOffset(xOffset), m_yOffset(yOffset) {}
 
 	EventType getType() const override { return m_type; }
+
 	std::string toString() const override
 	{
 		std::stringstream ss;
@@ -72,6 +77,10 @@ public:
 		: m_type(EventType::MouseMovedEvent), m_x(x), m_y(y) {}
 
 	EventType getType() const override { return m_type; }
+
+	int getX() const { return m_x; }
+	int getY() const { return m_y; }
+
 	std::string toString() const override
 	{
 		std::stringstream ss;

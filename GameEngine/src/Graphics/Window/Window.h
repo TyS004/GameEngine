@@ -1,10 +1,5 @@
 #pragma once
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <string>
-#include <functional>
-
 #include "Events/Event.h"
 
 class Window
@@ -24,12 +19,14 @@ public:
 	static GLFWwindow* m_Window;
 	static WindowData m_Data;
 
+	static bool isMouseLocked;
+
 	struct WindowProps
 	{
 		const std::string title;
 		unsigned int width, height;
 
-		WindowProps(const std::string& title = "Game Engine", unsigned int width = 680, unsigned int height = 480)
+		WindowProps(const std::string& title = "Game Engine", unsigned int width = 800, unsigned int height = 600)
 			: title(title), width(width), height(height) {}
 	};
 
@@ -45,6 +42,9 @@ public:
 	inline static void SetEventCallback(const EventCallbackFn& callback)  { m_Data.EventCallback = callback; }
 	static void SetVSync(bool enabled);
 	static bool IsVSync();
+	
+	static void SetCursorMode(GLuint mode);
+	static void LockMouse();
 
 private:
 	static void Shutdown();

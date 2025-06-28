@@ -2,9 +2,6 @@
 
 #include "Shader.h"
 
-#include <fstream>
-#include <filesystem>
-
 Shader::Shader()
 {
 	m_vertexSource = getFileContents("assets/shaders/default.vert");
@@ -84,7 +81,7 @@ void Shader::handleErrors(GLuint type, const std::string& source, GLuint shaderI
 		int length;
 		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &length);
 
-		char* message = (char*)alloca(length * sizeof(char));
+		char* message = (char*)_malloca(length * sizeof(char));
 		glGetShaderInfoLog(shaderID, length, &length, message);
 		
 		if (type == GL_VERTEX_SHADER)

@@ -13,5 +13,8 @@ class MouseInput
 {
 public:
 	static bool isMouseButtonPressed(int button);
-	void getMousePos(double& x, double& y);
+	static std::pair<float, float> getMousePos();
+
+private:
+	static std::pair<float, float> lastMousePos;
 };

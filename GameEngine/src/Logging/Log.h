@@ -1,21 +1,22 @@
 #pragma once
 
-#include <Windows.h>
-#include <string>
-#include <iostream>
-#include <chrono>
-#include <iomanip>
-
 class Log
 {
 public:
     static void Init();
     static HANDLE getConsoleHandle();
 
-    static void info(const std::string& message, HANDLE handle);
-	static void warn(const std::string& message, HANDLE handle);
-	static void fatal(const std::string& message, HANDLE handle);
-	static void trace(const std::string& message, HANDLE handle);
+    template <typename T>
+    static void info(const T& message, HANDLE handle);
+
+    template <typename T>
+	static void warn(const T& message, HANDLE handle);
+
+    template <typename T>
+	static void fatal(const T& message, HANDLE handle);
+
+    template <typename T>
+	static void trace(const T& message, HANDLE handle);
 
     static void updateTimeNow();
 
@@ -23,6 +24,43 @@ private:
     static HANDLE m_ConsoleHandle;
     static std::tm m_timeNow;
 };
+
+template <typename T>
+void Log::info(const T& message, HANDLE handle)
+{
+    updateTimeNow();
+
+    SetConsoleTextAttribute(handle, static_cast<WORD>(ConsoleColor::LIGHTBLUE));
+    std::cout << std::put_time(&m_timeNow, "%H:%M:%S") << " GameEngine: " << message << std::endl;
+}
+
+template <typename T>
+void Log::warn(const T& message, HANDLE handle)
+{
+    updateTimeNow();
+
+    SetConsoleTextAttribute(handle, static_cast<WORD>(ConsoleColor::LIGHTRED));
+    std::cout << std::put_time(&m_timeNow, "%H:%M:%S") << " GameEngine: " << message << std::endl;
+}
+
+
+template <typename T>
+void Log::trace(const T& message, HANDLE handle)
+{
+    updateTimeNow();
+
+    SetConsoleTextAttribute(handle, static_cast<WORD>(ConsoleColor::GREEN));
+    std::cout << std::put_time(&m_timeNow, "%H:%M:%S") << " GameEngine: " << message << std::endl;
+}
+
+template <typename T>
+void Log::fatal(const T& message, HANDLE handle)
+{
+    updateTimeNow();
+
+    SetConsoleTextAttribute(handle, static_cast<WORD>(ConsoleColor::RED));
+    std::cout << std::put_time(&m_timeNow, "%H:%M:%S") << " GameEngine: " << message << std::endl;
+}
 
 enum class ConsoleColor
 {

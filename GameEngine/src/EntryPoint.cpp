@@ -1,6 +1,5 @@
 #include "gepch.h"
 
-#include <iostream>
 #include "Application.h"
 #include "Logging/Log.h"
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <glad/glad.h>
+#include "gepch.h"
+
 #include "VBO.h"
 
 class VAO

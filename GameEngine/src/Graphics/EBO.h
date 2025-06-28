@@ -1,13 +1,12 @@
 #pragma once
-#pragma once
 
-#include <glad/glad.h>
+#include "gepch.h"
 
 class EBO
 {
 public:
 	GLuint ID;
-	inline EBO(GLfloat* vertices, int size)
+	inline EBO(GLuint* vertices, int size)
 	{
 		glGenBuffers(1, &ID);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ID);

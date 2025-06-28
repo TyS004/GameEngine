@@ -11,6 +11,7 @@ static bool s_GLFWIntialized = false;
 
 GLFWwindow* Window::m_Window;
 Window::WindowData Window::m_Data;
+bool Window::isMouseLocked = false;
 
 static void GLFWErrorCallback(int error, const char* description)
 {
@@ -150,4 +151,14 @@ void Window::SetVSync(bool enabled)
 bool Window::IsVSync()
 {
 	return Window::m_Data.VSync;
+}
+
+void Window::SetCursorMode(GLuint mode)
+{
+	glfwSetInputMode(m_Window, GLFW_CURSOR, mode);
+}
+
+void Window::LockMouse()
+{
+	Window::isMouseLocked = true;
 }

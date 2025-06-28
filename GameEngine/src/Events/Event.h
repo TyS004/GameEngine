@@ -1,9 +1,5 @@
 #pragma once
 
-#include <functional>
-#include <string>
-#include <sstream>
-
 enum class EventType
 {
 	WindowCloseEvent, WindowResizeEvent,

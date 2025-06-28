@@ -11,6 +11,10 @@
 
 #include "Input/Input.h"
 
+#include "Objects/Triangle.h"
+
+#include "Camera/Camera.h"
+
 class Application
 {
 public:
@@ -22,9 +26,16 @@ public:
 
 	bool OnWindowClose(WindowCloseEvent& e);
 	bool OnKeyPressed(KeyPressedEvent& e);
+	bool OnMouseButtonPressed(MousePressedEvent& e);
+	bool OnMouseMoved(MouseMovedEvent& e);
 
 private:
 	bool m_Running = true;
 
 	OpenGL* m_Renderer;
+	Shader m_Shader;
+	Camera camera;
+
+	float m_lastXPos, m_lastYPos;
+	bool firstMouse = true;
 };

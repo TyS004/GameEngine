@@ -23,7 +23,8 @@ bool KeyInput::isKeyReleased(int keycode)
 	return false;
 }
 
-
+//Init Last Mouse to Center of Screen
+std::pair<float, float> MouseInput::lastMousePos = std::pair<float, float>(Window::GetWidth() / 2, Window::GetHeight() / 2);
 
 bool MouseInput::isMouseButtonPressed(int button)
 {
@@ -34,7 +35,11 @@ bool MouseInput::isMouseButtonPressed(int button)
 	return false;
 }
 
-void MouseInput::getMousePos(double& x, double& y)
+std::pair<float, float> MouseInput::getMousePos()
 {
-	glfwGetCursorPos(m_Window, &x, &y);
+	double x, y;
+
+	glfwGetCursorPos(Window::getWindow(), &x, &y);
+
+	return std::pair<float, float>(x, y);
 }

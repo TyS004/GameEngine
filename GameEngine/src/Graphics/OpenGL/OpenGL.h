@@ -2,11 +2,6 @@
 
 #include "Logging/Log.h"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-
 #include "Graphics/ShaderClass/Shader.h"
 
 #include "Graphics/VBO.h"
@@ -31,8 +26,6 @@ class Render
 public:
 	virtual void Init() = 0;
 	virtual void Clear() = 0;
-	virtual void DrawTriangle() = 0;
-	virtual void CreateBuffers() = 0;
 protected:
 	Render() {}
 };
@@ -45,12 +38,4 @@ public:
 
 	void Init() override;
 	void Clear() override;
-	void DrawTriangle() override;
-	void CreateBuffers() override;
-
-	void InitShaders();
-	void OnUpdate(const glm::mat4& trans);
-
-private:
-	Shader shader = Shader();
 };
