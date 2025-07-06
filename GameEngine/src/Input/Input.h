@@ -5,16 +5,13 @@
 class KeyInput
 {
 public:
-	static bool isKeyPressed(int keycode);
-	static bool isKeyReleased(int keycode);
+	static bool isKeyPressed(Window window, int keycode);
+	static bool isKeyReleased(Window window, int keycode);
 };
 
 class MouseInput
 {
 public:
-	static bool isMouseButtonPressed(int button);
-	static std::pair<float, float> getMousePos();
-
-private:
-	static std::pair<float, float> lastMousePos;
+	static bool isMouseButtonPressed(Window window, int button);
+	static std::pair<float, float> getMousePos(Window window);
 };

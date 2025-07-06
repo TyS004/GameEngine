@@ -11,11 +11,9 @@ public:
 
 	void SetCoordUniforms(const Shader& shader);
 
-	void Update();
+	void Update(Window window);
+	void Move(Window window);
 	void ProcessMouseMovement(float xOffset, float yOffset);
-
-	void SetModelMatrix(glm::mat4 model);
-	glm::mat4 GetModelMatrix();
 
 private:
 	float m_cameraSpeed = 0.01f;
@@ -37,7 +35,6 @@ private:
 
 	float m_FOV;
 
-	glm::mat4 m_model = glm::mat4(1.0f);
 	glm::mat4 m_view = glm::mat4(1.0f);
-	glm::mat4 m_projection;
+	glm::mat4 m_projection = glm::mat4(1.0f);
 };

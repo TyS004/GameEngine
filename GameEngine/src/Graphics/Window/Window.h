@@ -16,11 +16,6 @@ public:
 		EventCallbackFn EventCallback;
 	};
 
-	static GLFWwindow* m_Window;
-	static WindowData m_Data;
-
-	static bool isMouseLocked;
-
 	struct WindowProps
 	{
 		const std::string title;
@@ -30,22 +25,29 @@ public:
 			: title(title), width(width), height(height) {}
 	};
 
-	static void OnUpdate();
+	Window();
+	Window(WindowProps props);
 
-	static void Init(const WindowProps& props);
+	void OnUpdate();
 
-	inline static unsigned int GetWidth() { return m_Data.width; }
-	inline static unsigned int GetHeight() { return m_Data.height; }
+	inline unsigned int GetWidth() { return m_Data.width; }
+	inline unsigned int GetHeight() { return m_Data.height; }
+	inline GLFWwindow* getWindow() { return m_Window; }
 
-	inline static GLFWwindow* getWindow() { return m_Window; }
-
-	inline static void SetEventCallback(const EventCallbackFn& callback)  { m_Data.EventCallback = callback; }
-	static void SetVSync(bool enabled);
-	static bool IsVSync();
+	inline void SetEventCallback(const EventCallbackFn& callback)  { m_Data.EventCallback = callback; }
+	void SetVSync(bool enabled);
+	bool IsVSync();
 	
-	static void SetCursorMode(GLuint mode);
-	static void LockMouse();
+	void LockMouse();
+	void UnlockMouse();
+	bool isLocked();
 
 private:
-	static void Shutdown();
+	void Shutdown();
+	void Init(const WindowProps& props);
+
+	GLFWwindow* m_Window;
+	WindowData m_Data;
+
+	bool m_isLocked = false;
 };	

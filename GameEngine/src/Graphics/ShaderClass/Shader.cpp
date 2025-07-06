@@ -110,8 +110,8 @@ void Shader::handleErrors(GLuint type, const std::string& source, GLuint shaderI
 	}
 }
 
-void Shader::setUniformVar(const glm::mat4& trans)
+void Shader::setUniformVar(const glm::mat4& uniform, const char* uniformName) const
 {
-	GLuint trandformLocation = glGetUniformLocation(ID, "transform");
-	glUniformMatrix4fv(trandformLocation, 1, GL_FALSE, glm::value_ptr(trans));
+	GLuint location = glGetUniformLocation(ID, uniformName);
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(uniform));
 }

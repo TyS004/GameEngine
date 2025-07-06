@@ -15,6 +15,8 @@
 
 #include "Camera/Camera.h"
 
+#include "Math/Math.h"
+
 class Application
 {
 public:
@@ -32,9 +34,14 @@ public:
 private:
 	bool m_Running = true;
 
+	int numWindows = 1;
+	int numObjects = 1;
+
+	Window** m_Windows;
 	OpenGL* m_Renderer;
-	Shader m_Shader;
-	Camera camera;
+	Shader* m_Shader;
+	Camera* m_Camera;
+	Triangle** m_Objects;
 
 	float m_lastXPos, m_lastYPos;
 	bool firstMouse = true;

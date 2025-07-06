@@ -9,14 +9,21 @@
 
 static bool s_GLFWIntialized = false;
 
-GLFWwindow* Window::m_Window;
-Window::WindowData Window::m_Data;
-bool Window::isMouseLocked = false;
-
 static void GLFWErrorCallback(int error, const char* description)
 {
 	//GE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 }
+
+Window::Window()
+{
+	Init(WindowProps());
+}
+
+Window::Window(WindowProps props)
+{
+	Init(props);
+}
+
 
 void Window::Init(const WindowProps& props)
 {
@@ -153,12 +160,19 @@ bool Window::IsVSync()
 	return Window::m_Data.VSync;
 }
 
-void Window::SetCursorMode(GLuint mode)
-{
-	glfwSetInputMode(m_Window, GLFW_CURSOR, mode);
-}
-
 void Window::LockMouse()
 {
-	Window::isMouseLocked = true;
+	glfwSetInputMode(Window::m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	m_isLocked = true;
+}
+
+void Window::UnlockMouse()
+{
+	glfwSetInputMode(Window::m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	m_isLocked = false;
+}
+
+bool Window::isLocked()
+{
+	return m_isLocked;
 }

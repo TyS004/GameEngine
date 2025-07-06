@@ -17,6 +17,7 @@ public:
 	}
 
 	inline static EventType getStaticType() { return EventType::KeyPressedEvent; }
+	inline int getKeycode() { return m_keycode; }
 
 private:
 	EventType m_type;

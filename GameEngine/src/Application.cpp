@@ -5,44 +5,89 @@
 
 Application::Application()
 {
-	Window::Init(Window::WindowProps());
-	Window::SetEventCallback(BIND_EVENT_FN(OnEvent));
+	m_Windows = new Window*[numWindows]();
+	m_Windows[0] = new Window();
+	m_Windows[0]->SetEventCallback(BIND_EVENT_FN(OnEvent));
+	m_Windows[0]->LockMouse();
 
-	m_lastXPos = Window::GetWidth() / 2;
-	m_lastYPos = Window::GetHeight() / 2;
+	m_lastXPos = m_Windows[0]->GetWidth() / 2;
+	m_lastYPos = m_Windows[0]->GetHeight() / 2;
 
 	m_Renderer = new OpenGL();
 
-	m_Shader.CompileShaders();
-	m_Shader.Activate();
+	m_Shader = new Shader();
+	m_Shader->CompileShaders();
+	m_Shader->Activate();
+
+	m_Camera = new Camera();
+
+	m_Objects = new Triangle*[numObjects];
+	m_Objects[0] = new Triangle(0.0f, 0.0f, 0.0f);
+
+	Math::Matrix4D matrix = Math::Matrix4D(1.0f);
+	//INFO(matrix);
+
+	bool open;
+	//ImGui::Begin("Level Editor", &open, ImGuiWindowFlags_MenuBar);
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui_ImplGlfw_InitForOpenGL(m_Windows[0]->getWindow(), true);
+	ImGui_ImplOpenGL3_Init();
 }
 
 Application::~Application()
 {
-
+	for (int i = 0; i < numWindows; ++i)
+	{
+		delete m_Windows[i];
+	}
+	for (int i = 0; i < numObjects; ++i)
+	{
+		delete m_Objects[i];
+	}
+	delete m_Renderer;
+	delete m_Camera;
+	delete m_Shader;
+	
 }
 
 void Application::run()
 {
-	Triangle triangle = Triangle(18);
 	while (m_Running)
 	{
 		m_Renderer->Clear();
-		triangle.Draw();
 
-		//Rotation Input
-		if (KeyInput::isKeyPressed(GLFW_KEY_Q))
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame(); 
+		ImGui::NewFrame();
+		ImGui::Begin("Level Editor");
+
+		bool isClicked = false;
+		isClicked = ImGui::Button("Spawn Object");
+
+		if (isClicked)
 		{
-			triangle.Rotate(camera, 0.02f);
-		}
-		else if (KeyInput::isKeyPressed(GLFW_KEY_E))
-		{
-			triangle.Rotate(camera, -0.02f);
+			m_Objects[numObjects++] = new Triangle(5.0f, 5.0f, 5.0f);
+			INFO("Spawned Object");
 		}
 
-		camera.Update();
-		camera.SetCoordUniforms(m_Shader);
-		Window::OnUpdate();
+		m_Camera->Update(*m_Windows[0]);
+		m_Camera->SetCoordUniforms(*m_Shader);
+
+		for (int i = 0; i < numObjects; ++i)
+		{
+			m_Objects[i]->setUniform(*m_Shader);
+			m_Objects[i]->Draw();
+		}
+
+		ImGui::End();
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		for (int i = 0; i < numWindows; ++i)
+		{
+			m_Windows[i]->OnUpdate();
+		}
 	}
 }
 
@@ -66,16 +111,21 @@ bool Application::OnWindowClose(WindowCloseEvent& e)
 
 bool Application::OnKeyPressed(KeyPressedEvent& e)
 {
+	if (e.getKeycode() == GLFW_KEY_ESCAPE && !m_Windows[0]->isLocked())
+	{
+		m_Windows[0]->LockMouse();
+	}
+	else if(e.getKeycode() == GLFW_KEY_ESCAPE)
+	{
+		m_Windows[0]->UnlockMouse();
+		firstMouse = true;
+	}
+
 	return true;
 }
 
 bool Application::OnMouseButtonPressed(MousePressedEvent& e)
 {
-	if (e.getButton() == GLFW_MOUSE_BUTTON_1)
-	{
-		Window::LockMouse();
-		glfwSetInputMode(Window::m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	}
 	return true;
 }
 
@@ -96,8 +146,10 @@ bool Application::OnMouseMoved(MouseMovedEvent& e)
 	m_lastXPos = e.getX();
 	m_lastYPos = e.getY();
 
-	camera.ProcessMouseMovement(xOffset, yOffset);
-
-	TRACE(std::to_string(xOffset) + std::string(", ") + std::to_string(yOffset));
+	if (m_Windows[0]->isLocked())
+	{
+		m_Camera->ProcessMouseMovement(xOffset, yOffset);
+	}
+	//TRACE(std::to_string(xOffset) + std::string(", ") + std::to_string(yOffset));
 	return true;
 }

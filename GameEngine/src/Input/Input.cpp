@@ -2,44 +2,38 @@
 
 #include "Input.h"
 
-static GLFWwindow* m_Window = Window::getWindow();
-
-
-bool KeyInput::isKeyPressed(int keycode)
+bool KeyInput::isKeyPressed(Window window, int keycode)
 {
-	if (glfwGetKey(Window::getWindow(), keycode) == GLFW_PRESS)
+	if (glfwGetKey(window.getWindow(), keycode) == GLFW_PRESS)
 	{
 		return true;
 	}
 	return false;
 }
 
-bool KeyInput::isKeyReleased(int keycode)
+bool KeyInput::isKeyReleased(Window window, int keycode)
 {
-	if (glfwGetKey(Window::getWindow(), keycode) == GLFW_RELEASE)
+	if (glfwGetKey(window.getWindow(), keycode) == GLFW_RELEASE)
 	{
 		return true;
 	}
 	return false;
 }
 
-//Init Last Mouse to Center of Screen
-std::pair<float, float> MouseInput::lastMousePos = std::pair<float, float>(Window::GetWidth() / 2, Window::GetHeight() / 2);
-
-bool MouseInput::isMouseButtonPressed(int button)
+bool MouseInput::isMouseButtonPressed(Window window, int button)
 {
-	if (glfwGetMouseButton(Window::getWindow(), button) == GLFW_PRESS)
+	if (glfwGetMouseButton(window.getWindow(), button) == GLFW_PRESS)
 	{
 		return true;
 	}
 	return false;
 }
 
-std::pair<float, float> MouseInput::getMousePos()
+std::pair<float, float> MouseInput::getMousePos(Window window)
 {
 	double x, y;
 
-	glfwGetCursorPos(Window::getWindow(), &x, &y);
+	glfwGetCursorPos(window.getWindow(), &x, &y);
 
 	return std::pair<float, float>(x, y);
 }
