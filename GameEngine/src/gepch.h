@@ -9,6 +9,7 @@
 #include <sstream>
 #include <utility>
 #include <filesystem>
+#include <vector>
 
 #include <functional>
 

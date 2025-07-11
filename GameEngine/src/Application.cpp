@@ -5,13 +5,15 @@
 
 Application::Application()
 {
-	m_Windows = new Window*[numWindows]();
-	m_Windows[0] = new Window();
-	m_Windows[0]->SetEventCallback(BIND_EVENT_FN(OnEvent));
-	m_Windows[0]->LockMouse();
+	//Window Init
+	m_Windows.reserve(2);
+	m_Windows.push_back(new Window());
+	m_Windows[m_ActiveWindow]->SetEventCallback(BIND_EVENT_FN(OnEvent));
+	m_Windows[m_ActiveWindow]->LockMouse();
 
-	m_lastXPos = m_Windows[0]->GetWidth() / 2;
-	m_lastYPos = m_Windows[0]->GetHeight() / 2;
+	//Mouse Offset Init (This May need to move places)
+	m_lastXPos = m_Windows[m_ActiveWindow]->GetWidth() / 2;
+	m_lastYPos = m_Windows[m_ActiveWindow]->GetHeight() / 2;
 
 	m_Renderer = new OpenGL();
 
@@ -21,72 +23,53 @@ Application::Application()
 
 	m_Camera = new Camera();
 
-	m_Objects = new Triangle*[numObjects];
-	m_Objects[0] = new Triangle(0.0f, 0.0f, 0.0f);
+	m_UI = new UI(*m_Windows[m_ActiveWindow]);
 
-	Math::Matrix4D matrix = Math::Matrix4D(1.0f);
-	//INFO(matrix);
-
-	bool open;
-	//ImGui::Begin("Level Editor", &open, ImGuiWindowFlags_MenuBar);
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui_ImplGlfw_InitForOpenGL(m_Windows[0]->getWindow(), true);
-	ImGui_ImplOpenGL3_Init();
+	//Reserving for 5 Objs rn & just create one at (0, 0, 0)
+	m_Objects.reserve(5);
+	m_Objects.push_back(new Object(0.0f, 0.0f, 0.0f));
+	m_Objects[m_SelectedObject]->setUniform(*m_Shader);
 }
 
 Application::~Application()
 {
-	for (int i = 0; i < numWindows; ++i)
-	{
-		delete m_Windows[i];
-	}
-	for (int i = 0; i < numObjects; ++i)
-	{
-		delete m_Objects[i];
-	}
 	delete m_Renderer;
 	delete m_Camera;
 	delete m_Shader;
-	
 }
 
-void Application::run()
+void Application::Run()
 {
+	//IMGUI Element Creation
+	Viewport* mainViewport = m_UI->CreateViewport("Viewport");
+
+	Slider* xPos = mainViewport->CreateSlider("X Position", BIND_EVENT_FN(OnImGuiSliderChanged));
+	Slider* yPos = mainViewport->CreateSlider("Y Position", BIND_EVENT_FN(OnImGuiSliderChanged));
+	Slider* zPos = mainViewport->CreateSlider("Z Position", BIND_EVENT_FN(OnImGuiSliderChanged));
+
+	Button* spawnButton = mainViewport->CreateButton("Spawn Object", BIND_EVENT_FN(OnImGuiButtonPressed));
+
+	//Main Loop
 	while (m_Running)
 	{
 		m_Renderer->Clear();
+		m_UI->StartFrame();
+		m_UI->Update();
 
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame(); 
-		ImGui::NewFrame();
-		ImGui::Begin("Level Editor");
-
-		bool isClicked = false;
-		isClicked = ImGui::Button("Spawn Object");
-
-		if (isClicked)
-		{
-			m_Objects[numObjects++] = new Triangle(5.0f, 5.0f, 5.0f);
-			INFO("Spawned Object");
-		}
-
-		m_Camera->Update(*m_Windows[0]);
+		m_Camera->Update(*m_Windows[m_ActiveWindow]);
 		m_Camera->SetCoordUniforms(*m_Shader);
 
-		for (int i = 0; i < numObjects; ++i)
+		for (Object* object : m_Objects)
 		{
-			m_Objects[i]->setUniform(*m_Shader);
-			m_Objects[i]->Draw();
+			object->setUniform(*m_Shader);
+			object->Draw();
 		}
 
-		ImGui::End();
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		m_UI->EndFrame();
 
-		for (int i = 0; i < numWindows; ++i)
+		for (Window* window : m_Windows)
 		{
-			m_Windows[i]->OnUpdate();
+			window->OnUpdate();
 		}
 	}
 }
@@ -111,16 +94,15 @@ bool Application::OnWindowClose(WindowCloseEvent& e)
 
 bool Application::OnKeyPressed(KeyPressedEvent& e)
 {
-	if (e.getKeycode() == GLFW_KEY_ESCAPE && !m_Windows[0]->isLocked())
+	if (e.getKeycode() == GLFW_KEY_ESCAPE && !m_Windows[m_ActiveWindow]->isLocked())
 	{
-		m_Windows[0]->LockMouse();
+		m_Windows[m_ActiveWindow]->LockMouse();
 	}
 	else if(e.getKeycode() == GLFW_KEY_ESCAPE)
 	{
-		m_Windows[0]->UnlockMouse();
+		m_Windows[m_ActiveWindow]->UnlockMouse();
 		firstMouse = true;
 	}
-
 	return true;
 }
 
@@ -131,8 +113,6 @@ bool Application::OnMouseButtonPressed(MousePressedEvent& e)
 
 bool Application::OnMouseMoved(MouseMovedEvent& e)
 {
-	//INFO(std::to_string(e.getX()) + std::string(", ") + std::to_string(e.getY()));
-
 	if(firstMouse)
 	{
 		m_lastXPos = e.getX();
@@ -146,10 +126,37 @@ bool Application::OnMouseMoved(MouseMovedEvent& e)
 	m_lastXPos = e.getX();
 	m_lastYPos = e.getY();
 
-	if (m_Windows[0]->isLocked())
+	if (m_Windows[m_ActiveWindow]->isLocked())
 	{
 		m_Camera->ProcessMouseMovement(xOffset, yOffset);
 	}
-	//TRACE(std::to_string(xOffset) + std::string(", ") + std::to_string(yOffset));
 	return true;
+}
+
+void Application::OnImGuiSliderChanged(const UIElement& element)
+{
+	const Slider& slider = dynamic_cast<const Slider&>(element);
+	m_SliderValues[slider.GetName()] = slider.GetData();
+
+	Object* currentObj = m_Objects[m_SelectedObject];
+
+	if (slider.GetName() == "X Position")
+	{
+		currentObj->Translate(slider.GetData(), currentObj->getTransform().y, currentObj->getTransform().z, *m_Shader);
+		INFO(slider.GetData());
+	}
+	else if (slider.GetName() == "Y Position")
+	{
+		currentObj->Translate(currentObj->getTransform().x, slider.GetData(), currentObj->getTransform().z, *m_Shader);
+	}
+	else if (slider.GetName() == "Z Position")
+	{
+		currentObj->Translate(currentObj->getTransform().x, currentObj->getTransform().y, slider.GetData(), *m_Shader);
+	}
+}
+
+void Application::OnImGuiButtonPressed(const UIElement& element)
+{
+	const Button& button = dynamic_cast<const Button&>(element);
+	m_Objects.emplace_back(new Object(m_SliderValues["X Position"], m_SliderValues["Y Position"], m_SliderValues["Z Position"]));
 }

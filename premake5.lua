@@ -14,6 +14,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "GameEngine/vendor/GLFW/include"
 IncludeDir["glad"] = "GameEngine/vendor/glad/include"
 IncludeDir["glm"] = "GameEngine/vendor/glm-master"
+IncludeDir["imgui"] = "GameEngine/vendor/imgui-docking"
 
 include "GameEngine/vendor/GLFW"
 
@@ -32,7 +33,10 @@ project "GameEngine"
 		"%{prj.name}/src/**.cpp",
 		"%{prj.name}/assets/shaders/**.vert",
 		"%{prj.name}/assets/shaders/**.frag",
-		"%{prj.name}/vendor/glad/src/**.c"
+		"%{prj.name}/vendor/glad/src/**.c",
+		"%{prj.name}/vendor/imgui-docking/*.cpp",
+		"%{prj.name}/vendor/imgui-docking/backends/imgui_impl_glfw.cpp",
+		"%{prj.name}/vendor/imgui-docking/backends/imgui_impl_opengl3.cpp"
 	}
 
 	includedirs
@@ -40,7 +44,8 @@ project "GameEngine"
 		"%{prj.name}/src",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glad}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.imgui}"
 	}
 
 	links

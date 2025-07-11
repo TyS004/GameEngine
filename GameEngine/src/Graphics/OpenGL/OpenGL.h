@@ -4,8 +4,8 @@
 
 #include "Graphics/ShaderClass/Shader.h"
 
-#include "Graphics/VBO.h"
-#include "Graphics/VAO.h"
+#include "Graphics/Buffer/VBO.h"
+#include "Graphics/Buffer/VAO.h"
 
 class Render
 {
