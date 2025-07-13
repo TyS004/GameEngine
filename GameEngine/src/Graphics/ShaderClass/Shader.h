@@ -19,6 +19,7 @@ public:
 	void handleErrors(GLuint type, const std::string& source, GLuint shaderID);
 
 	void setUniformVar(const glm::mat4& uniform, const char* uniformName) const;
+	void setTextureUniform();
 
 private:
 	std::string m_vertexSource, m_fragmentSource;

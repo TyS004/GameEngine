@@ -20,6 +20,8 @@
 #include "UI/UIElements/UIElement.h"
 #include "UI/UI.h"
 
+#include "Graphics/Buffer/Texture.h"
+
 class Application
 {
 public:
@@ -27,12 +29,15 @@ public:
 	~Application();
 
 	void Run();
+	void DrawObjects();
+	void UpdateWindows();
 	void OnEvent(Event& e);
 
 	bool OnWindowClose(WindowCloseEvent& e);
 	bool OnKeyPressed(KeyPressedEvent& e);
 	bool OnMouseButtonPressed(MousePressedEvent& e);
 	bool OnMouseMoved(MouseMovedEvent& e);
+	bool OnWindowResize(WindowResizeEvent& e);
 	
 	//UI / ImGUI
 	void OnImGuiSliderChanged(const UIElement& element);

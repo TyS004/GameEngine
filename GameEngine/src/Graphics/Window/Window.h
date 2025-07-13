@@ -10,7 +10,7 @@ public:
 	struct WindowData
 	{
 		std::string title;
-		unsigned int width, height;
+		uint32_t width, height;
 		bool VSync;
 
 		EventCallbackFn EventCallback;
@@ -21,7 +21,7 @@ public:
 		const std::string title;
 		unsigned int width, height;
 
-		WindowProps(const std::string& title = "Game Engine", unsigned int width = 800, unsigned int height = 600)
+		WindowProps(const std::string& title = "Game Engine", unsigned int width = 1280, unsigned int height = 720)
 			: title(title), width(width), height(height) {}
 	};
 

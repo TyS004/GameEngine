@@ -11,7 +11,7 @@ static bool s_GLFWIntialized = false;
 
 static void GLFWErrorCallback(int error, const char* description)
 {
-	//GE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+	WARN("GLFW ERROR OCCURED!");
 }
 
 Window::Window()

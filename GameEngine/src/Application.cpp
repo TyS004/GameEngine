@@ -7,13 +7,12 @@ Application::Application()
 {
 	//Window Init
 	m_Windows.reserve(2);
-	m_Windows.push_back(new Window());
+	m_Windows.push_back(new Window(Window::WindowProps("GameEngine", 800, 600)));
 	m_Windows[m_ActiveWindow]->SetEventCallback(BIND_EVENT_FN(OnEvent));
 	m_Windows[m_ActiveWindow]->LockMouse();
 
-	//Mouse Offset Init (This May need to move places)
-	m_lastXPos = m_Windows[m_ActiveWindow]->GetWidth() / 2;
-	m_lastYPos = m_Windows[m_ActiveWindow]->GetHeight() / 2;
+	m_lastXPos = 0.0f;
+	m_lastYPos = 0.0f;
 
 	m_Renderer = new OpenGL();
 
@@ -48,29 +47,44 @@ void Application::Run()
 	Slider* zPos = mainViewport->CreateSlider("Z Position", BIND_EVENT_FN(OnImGuiSliderChanged));
 
 	Button* spawnButton = mainViewport->CreateButton("Spawn Object", BIND_EVENT_FN(OnImGuiButtonPressed));
+	
+	Texture texture("assets/textures/brick-3.png");
+	texture.Bind();
+	m_Shader->setTextureUniform();
 
 	//Main Loop
 	while (m_Running)
 	{
 		m_Renderer->Clear();
+
 		m_UI->StartFrame();
 		m_UI->Update();
 
 		m_Camera->Update(*m_Windows[m_ActiveWindow]);
 		m_Camera->SetCoordUniforms(*m_Shader);
 
-		for (Object* object : m_Objects)
-		{
-			object->setUniform(*m_Shader);
-			object->Draw();
-		}
+		DrawObjects();
 
 		m_UI->EndFrame();
 
-		for (Window* window : m_Windows)
-		{
-			window->OnUpdate();
-		}
+		UpdateWindows();
+	}
+}
+
+void Application::DrawObjects()
+{
+	for (Object* object : m_Objects)
+	{
+		object->setUniform(*m_Shader);
+		object->Draw();
+	}
+}
+
+void Application::UpdateWindows()
+{
+	for (Window* window : m_Windows)
+	{
+		window->OnUpdate();
 	}
 }
 
@@ -82,6 +96,7 @@ void Application::OnEvent(Event& e)
 	dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(OnKeyPressed));
 	dispatcher.Dispatch<MousePressedEvent>(BIND_EVENT_FN(OnMouseButtonPressed));
 	dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN(OnMouseMoved));
+	dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
 
 	//INFO(e.toString());
 }
@@ -115,21 +130,31 @@ bool Application::OnMouseMoved(MouseMovedEvent& e)
 {
 	if(firstMouse)
 	{
-		m_lastXPos = e.getX();
-		m_lastYPos = e.getY();
+		m_lastXPos = (float)e.getX();
+		m_lastYPos = (float)e.getY();
 		firstMouse = false;
 	}
 
 	float xOffset = e.getX() - m_lastXPos;
 	float yOffset = e.getY() - m_lastYPos;
 
-	m_lastXPos = e.getX();
-	m_lastYPos = e.getY();
+	m_lastXPos = (float)e.getX();
+	m_lastYPos = (float)e.getY();
 
 	if (m_Windows[m_ActiveWindow]->isLocked())
 	{
 		m_Camera->ProcessMouseMovement(xOffset, yOffset);
 	}
+	return true;
+}
+
+bool Application::OnWindowResize(WindowResizeEvent& e)
+{
+	int width, height;
+	glfwGetWindowSize(m_Windows[m_ActiveWindow]->getWindow(), &width, &height);
+	INFO("Window Resized");
+	INFO(std::to_string(width) + ", " +  std::to_string(height));
+
 	return true;
 }
 

@@ -5,15 +5,19 @@
 class VBO
 {
 public:
-	GLuint ID;
-	inline VBO(GLfloat* vertices, int size)
+	inline VBO(float* vertices, uint32_t size)
 	{
-		glGenBuffers(1, &ID); 
-		glBindBuffer(GL_ARRAY_BUFFER, ID);
+		glGenBuffers(1, &m_ID); 
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	inline void Bind() { glBindBuffer(GL_ARRAY_BUFFER, ID); }
-	inline void Unbind() { glBindBuffer(GL_ARRAY_BUFFER, 0); }
-	inline void Delete() { glDeleteBuffers(1, &ID); }
+	inline void Bind() const { glBindBuffer(GL_ARRAY_BUFFER, m_ID); }
+	inline void Unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
+	inline void Delete() { glDeleteBuffers(1, &m_ID); }
+
+private:
+	uint32_t m_ID;
 };
