@@ -6,6 +6,8 @@
 bin/
 bin-int/
 
+resources/
+
 *.sln
 *.vcxproj
 *.vcxproj.filters

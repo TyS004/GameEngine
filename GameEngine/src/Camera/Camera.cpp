@@ -4,7 +4,7 @@
 
 Camera::Camera()
 {
-	glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+	//glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
 
 	//Camera Position / Attributes
 	m_FOV = 45.0f;
@@ -41,7 +41,7 @@ void Camera::ProcessMouseMovement(float xOffset, float yOffset)
 	m_pitch -= yOffset * sensitivity;
 }
 
-void Camera::Update(Window window)
+void Camera::Update(Window window, float width, float height)
 {
 	Move(window);
 
@@ -52,16 +52,10 @@ void Camera::Update(Window window)
 	m_target = glm::normalize(m_direction);
 
 	m_view = glm::lookAt(m_position, m_target + m_position, m_up);
-	m_projection = glm::perspective(glm::radians(m_FOV), 800.0f / 600.0f, 0.1f, 100.0f);
+	m_projection = glm::perspective(glm::radians(m_FOV), width / height, 0.1f, 100.0f);
 
 	//std::string msg = "Camera Position: " + std::to_string(m_position.x) + ", " + std::to_string(m_position.y) + ", " + std::to_string(m_position.z);
 	//TRACE(msg);
-}
-
-void Camera::SetCoordUniforms(const Shader& shader)
-{
-	shader.setUniformVar(m_view, "view");
-	shader.setUniformVar(m_projection, "projection");
 }
 
 void Camera::Move(Window window)
@@ -103,4 +97,14 @@ void Camera::Move(Window window)
 	{
 		m_position += -m_up * m_cameraSpeed;
 	}
+}
+
+glm::mat4 Camera::GetViewMatrix()
+{
+	return m_view;
+}
+
+glm::mat4 Camera::GetProjectionMatrix()
+{
+	return m_projection;
 }

@@ -15,6 +15,7 @@ UI::UI(Window& window)
 
 	ImGuiIO& m_io = ImGui::GetIO();
 	m_io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	//m_io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
 	m_viewports.reserve(STARTINGVIEWPORTS);
 }

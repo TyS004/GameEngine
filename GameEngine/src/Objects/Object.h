@@ -14,10 +14,11 @@ public:
 	Object(float x, float y, float z);
 
 	void Draw() const;
-    void Translate(float x, float y, float z, const Shader& shader);
-    void setUniform(const Shader& shader);
+    void Translate(float x, float y, float z);
 
     int getID();
+    glm::mat4 GetModelMatrix();
+
     glm::vec3 getTransform() const;
 private:
     int m_ID;

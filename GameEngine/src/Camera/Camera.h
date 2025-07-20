@@ -11,9 +11,12 @@ public:
 
 	void SetCoordUniforms(const Shader& shader);
 
-	void Update(Window window);
+	void Update(Window window, float wdith, float height);
 	void Move(Window window);
 	void ProcessMouseMovement(float xOffset, float yOffset);
+
+	glm::mat4 GetViewMatrix();
+	glm::mat4 GetProjectionMatrix();
 
 private:
 	float m_cameraSpeed = 0.01f;

@@ -7,7 +7,7 @@ Application::Application()
 {
 	//Window Init
 	m_Windows.reserve(2);
-	m_Windows.push_back(new Window(Window::WindowProps("GameEngine", 800, 600)));
+	m_Windows.push_back(new Window(Window::WindowProps("GameEngine", START_WINDOW_WIDTH, START_WINDOW_HEIGHT)));
 	m_Windows[m_ActiveWindow]->SetEventCallback(BIND_EVENT_FN(OnEvent));
 	m_Windows[m_ActiveWindow]->LockMouse();
 
@@ -18,16 +18,12 @@ Application::Application()
 
 	m_Shader = new Shader();
 	m_Shader->CompileShaders();
-	m_Shader->Activate();
 
 	m_Camera = new Camera();
 
 	m_UI = new UI(*m_Windows[m_ActiveWindow]);
 
-	//Reserving for 5 Objs rn & just create one at (0, 0, 0)
 	m_Objects.reserve(5);
-	m_Objects.push_back(new Object(0.0f, 0.0f, 0.0f));
-	m_Objects[m_SelectedObject]->setUniform(*m_Shader);
 }
 
 Application::~Application()
@@ -40,31 +36,60 @@ Application::~Application()
 void Application::Run()
 {
 	//IMGUI Element Creation
-	Viewport* mainViewport = m_UI->CreateViewport("Viewport");
+	Viewport* mainViewport = m_UI->CreateViewport("Transform");
+	Viewport* sceneViewport = m_UI->CreateViewport("Viewport");
 
-	Slider* xPos = mainViewport->CreateSlider("X Position", BIND_EVENT_FN(OnImGuiSliderChanged));
-	Slider* yPos = mainViewport->CreateSlider("Y Position", BIND_EVENT_FN(OnImGuiSliderChanged));
-	Slider* zPos = mainViewport->CreateSlider("Z Position", BIND_EVENT_FN(OnImGuiSliderChanged));
+	Slider* xPos = mainViewport->CreateSlider("X", BIND_EVENT_FN(OnImGuiSliderChanged));
+	Slider* yPos = mainViewport->CreateSlider("Y", BIND_EVENT_FN(OnImGuiSliderChanged));
+	Slider* zPos = mainViewport->CreateSlider("Z", BIND_EVENT_FN(OnImGuiSliderChanged));
 
 	Button* spawnButton = mainViewport->CreateButton("Spawn Object", BIND_EVENT_FN(OnImGuiButtonPressed));
+
+	Texture frameTexture(m_Windows[m_ActiveWindow]->GetWidth(), m_Windows[m_ActiveWindow]->GetHeight());
+	FBO FBO1(frameTexture, m_Windows[m_ActiveWindow]->GetWidth(), m_Windows[m_ActiveWindow]->GetHeight());
+	RBO RBO1(FBO1, m_Windows[m_ActiveWindow]->GetWidth(), m_Windows[m_ActiveWindow]->GetHeight());
+
+	Texture blockTexture("assets/textures/brick-3.png");
+
+	m_Objects.push_back(new Object(0.0f, 0.0f, 0.0f));
+	m_Shader->setUniformMat4f(m_Objects[m_SelectedObject]->GetModelMatrix(), "model");
 	
-	Texture texture("assets/textures/brick-3.png");
-	texture.Bind();
-	m_Shader->setTextureUniform();
+	glViewport(0, 0, START_WINDOW_WIDTH, START_WINDOW_HEIGHT);
 
 	//Main Loop
 	while (m_Running)
 	{
+		//1st Pass Rendering Objects to FBO
+		FBO1.Bind();
+		blockTexture.Bind();
+
+		m_Shader->Activate();
+		m_Shader->setTextureUniform(0);
 		m_Renderer->Clear();
-
-		m_UI->StartFrame();
-		m_UI->Update();
-
-		m_Camera->Update(*m_Windows[m_ActiveWindow]);
-		m_Camera->SetCoordUniforms(*m_Shader);
-
+		m_Camera->Update(*m_Windows[m_ActiveWindow], m_viewportWidth, m_viewportHeight);
+		m_Shader->setUniformMat4f(m_Camera->GetViewMatrix(), "view");
+		m_Shader->setUniformMat4f(m_Camera->GetProjectionMatrix(), "projection");
 		DrawObjects();
 
+		blockTexture.Unbind();
+		FBO1.Unbind();
+
+		////2nd Pass FBO -> Quad
+		m_Renderer->Clear();
+		//m_Renderer->RenderQuad(frameTexture);
+
+		//ImGui Render Loop
+		m_UI->StartFrame();
+		m_UI->Update();
+		
+		ImVec2 wsize = ImGui::GetWindowSize();
+		ImVec2 pos = ImGui::GetCursorScreenPos();
+
+		auto viewportSize = ImGui::GetContentRegionAvail();
+		m_viewportWidth = viewportSize.x;
+		m_viewportHeight = viewportSize.y;
+
+		ImGui::Image(frameTexture.getID(), wsize, ImVec2(0, 1), ImVec2(1, 0));
 		m_UI->EndFrame();
 
 		UpdateWindows();
@@ -75,7 +100,7 @@ void Application::DrawObjects()
 {
 	for (Object* object : m_Objects)
 	{
-		object->setUniform(*m_Shader);
+		m_Shader->setUniformMat4f(object->GetModelMatrix(), "model");
 		object->Draw();
 	}
 }
@@ -97,8 +122,6 @@ void Application::OnEvent(Event& e)
 	dispatcher.Dispatch<MousePressedEvent>(BIND_EVENT_FN(OnMouseButtonPressed));
 	dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN(OnMouseMoved));
 	dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
-
-	//INFO(e.toString());
 }
 
 bool Application::OnWindowClose(WindowCloseEvent& e)
@@ -118,6 +141,19 @@ bool Application::OnKeyPressed(KeyPressedEvent& e)
 		m_Windows[m_ActiveWindow]->UnlockMouse();
 		firstMouse = true;
 	}
+
+	/*if (e.getKeycode() == GLFW_KEY_Y)
+	{
+		ImVec2 wsize = ImGui::GetWindowSize();
+		ImVec2 pos = ImGui::GetCursorScreenPos();
+
+		auto viewportSize = ImGui::GetContentRegionAvail();
+
+		INFO("ImGui Scene Size: " + std::to_string(wsize.x) + " " + std::to_string(wsize.y));
+		INFO("ImGui Scene Position: " + std::to_string(pos.x) + " " + std::to_string(pos.y));
+		TRACE("Viewport: " + std::to_string(viewportSize.x) + " " + std::to_string(viewportSize.y));
+	}*/
+
 	return true;
 }
 
@@ -145,6 +181,8 @@ bool Application::OnMouseMoved(MouseMovedEvent& e)
 	{
 		m_Camera->ProcessMouseMovement(xOffset, yOffset);
 	}
+
+	//TRACE(std::to_string(e.getX()) + " " + std::to_string(e.getY()));
 	return true;
 }
 
@@ -154,6 +192,9 @@ bool Application::OnWindowResize(WindowResizeEvent& e)
 	glfwGetWindowSize(m_Windows[m_ActiveWindow]->getWindow(), &width, &height);
 	INFO("Window Resized");
 	INFO(std::to_string(width) + ", " +  std::to_string(height));
+
+	//m_Renderer->ResizeViewport(e.getWidth(), e.getHeight());
+	//ImGui::SetWindowSize(ImVec2(e.getWidth(), e.getHeight()));
 
 	return true;
 }
@@ -165,23 +206,29 @@ void Application::OnImGuiSliderChanged(const UIElement& element)
 
 	Object* currentObj = m_Objects[m_SelectedObject];
 
-	if (slider.GetName() == "X Position")
+	if (slider.GetName() == "X")
 	{
-		currentObj->Translate(slider.GetData(), currentObj->getTransform().y, currentObj->getTransform().z, *m_Shader);
+		currentObj->Translate(slider.GetData(), currentObj->getTransform().y, currentObj->getTransform().z);
 		INFO(slider.GetData());
 	}
-	else if (slider.GetName() == "Y Position")
+	else if (slider.GetName() == "Y")
 	{
-		currentObj->Translate(currentObj->getTransform().x, slider.GetData(), currentObj->getTransform().z, *m_Shader);
+		currentObj->Translate(currentObj->getTransform().x, slider.GetData(), currentObj->getTransform().z);
+		INFO(slider.GetData());
 	}
-	else if (slider.GetName() == "Z Position")
+	else if (slider.GetName() == "Z")
 	{
-		currentObj->Translate(currentObj->getTransform().x, currentObj->getTransform().y, slider.GetData(), *m_Shader);
+		currentObj->Translate(currentObj->getTransform().x, currentObj->getTransform().y, slider.GetData());
+		INFO(slider.GetData());
 	}
 }
 
 void Application::OnImGuiButtonPressed(const UIElement& element)
 {
 	const Button& button = dynamic_cast<const Button&>(element);
-	m_Objects.emplace_back(new Object(m_SliderValues["X Position"], m_SliderValues["Y Position"], m_SliderValues["Z Position"]));
+	m_Objects.emplace_back(new Object(m_SliderValues["X"], m_SliderValues["Y"], m_SliderValues["Z"]));
+
+	TRACE(m_SliderValues["X"]);
+	TRACE(m_SliderValues["Y"]);
+	TRACE(m_SliderValues["Z"]);
 }

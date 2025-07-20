@@ -21,6 +21,11 @@
 #include "UI/UI.h"
 
 #include "Graphics/Buffer/Texture.h"
+#include "Graphics/Buffer/FBO.h"
+#include "Graphics/Buffer/RBO.h"
+
+static const float START_WINDOW_WIDTH = 800.0f;
+static const float START_WINDOW_HEIGHT = 600.0f;
 
 class Application
 {
@@ -64,24 +69,7 @@ private:
 
 	float m_lastXPos, m_lastYPos;
 	bool firstMouse = true;
-};
 
-//template <typename T>
-//void Application::OnSliderChanged(const Slider<T>& slider)
-//{
-//	Object* currentObj = m_Objects[m_SelectedObject];
-//
-//	if (slider.GetName() == "X Position")
-//	{
-//		currentObj->Translate(slider.GetData(), currentObj->getTransform().y, currentObj->getTransform().z, *m_Shader);
-//		INFO(slider.GetData());
-//	}
-//	else if (slider.GetName() == "Y Position")
-//	{
-//		currentObj->Translate(currentObj->getTransform().x, slider.GetData(), currentObj->getTransform().z, *m_Shader);
-//	}
-//	else if (slider.GetName() == "Z Position")
-//	{
-//		currentObj->Translate(currentObj->getTransform().x, currentObj->getTransform().y, slider.GetData(), *m_Shader);
-//	}
-//}
+	float m_viewportWidth = START_WINDOW_WIDTH;
+	float m_viewportHeight = START_WINDOW_HEIGHT;
+};

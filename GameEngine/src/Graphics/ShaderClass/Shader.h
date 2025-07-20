@@ -18,8 +18,8 @@ public:
 	void CompileShaders();
 	void handleErrors(GLuint type, const std::string& source, GLuint shaderID);
 
-	void setUniformVar(const glm::mat4& uniform, const char* uniformName) const;
-	void setTextureUniform();
+	void setUniformMat4f(const glm::mat4& uniform, const char* uniformName) const;
+	void setTextureUniform(uint32_t tex);
 
 private:
 	std::string m_vertexSource, m_fragmentSource;

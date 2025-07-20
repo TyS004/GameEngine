@@ -38,8 +38,11 @@ public:
 
 	inline static EventType getStaticType() { return EventType::WindowResizeEvent; }
 
+	inline uint32_t getWidth() { return m_xOffset; }
+	inline uint32_t getHeight() { return m_yOffset; }
+
 private:
 	EventType m_type;
 
-	int m_xOffset, m_yOffset;
+	uint32_t m_xOffset, m_yOffset;
 };

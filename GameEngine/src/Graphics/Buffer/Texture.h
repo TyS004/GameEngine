@@ -5,6 +5,27 @@
 class Texture
 {
 public:
+	inline Texture(uint32_t width, uint32_t height)
+	{
+		m_pixelData = nullptr;
+		m_width = width;
+		m_height = height;
+		m_numChannels = 0;
+
+		glGenTextures(1, &m_ID);
+		std::cout << "Generated texture ID: " << m_ID << ", size: " << m_width << "x" << m_height << std::endl;
+		glBindTexture(GL_TEXTURE_2D, m_ID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+		//Texture Settings
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 	inline Texture(const char* filename)
 	{
 		m_pixelData = stbi_load(filename, &m_width, &m_height, &m_numChannels, 0);
@@ -29,9 +50,11 @@ public:
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	inline void Bind() { glBindTexture(GL_TEXTURE_2D, m_ID); }
-	inline void Unbind() { glBindTexture(GL_TEXTURE_2D, 0); }
-	inline void Delete() { glDeleteTextures(1, &m_ID); }
+	inline void Bind() const { glBindTexture(GL_TEXTURE_2D, m_ID); }
+	inline void Unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
+	inline void Delete() const { glDeleteTextures(1, &m_ID); }
+
+	inline uint32_t getID() const { return m_ID; }
 
 private:
 	uint32_t m_ID;

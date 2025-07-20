@@ -23,7 +23,7 @@ project "GameEngine"
 	location "GameEngine"
 	kind "ConsoleApp"
 	language "C++"
-	buildoptions { "/utf-8", "/MP" }
+	buildoptions { "/MP" }	
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -69,8 +69,4 @@ project "GameEngine"
 
 	filter "configurations:Release"
 		defines "GE_RELEASE"
-		optimize "On"
-
-	filter "configurations:Dist"
-		defines "GE_DIST"
 		optimize "On"

@@ -33,7 +33,7 @@ void Object::Draw() const
 	m_VAO->Unbind();
 }
 
-void Object::Translate(float x, float y, float z, const Shader& shader)
+void Object::Translate(float x, float y, float z)
 {
 	float prev_X = position.x;
 	float prev_Y = position.y;
@@ -46,14 +46,14 @@ void Object::Translate(float x, float y, float z, const Shader& shader)
 	m_model = glm::translate(m_model, glm::vec3(position.x - prev_X, position.y - prev_Y, position.z - prev_Z));
 }
 
-void Object::setUniform(const Shader& shader)
-{
-	shader.setUniformVar(m_model, "model");
-}
-
 int Object::getID()
 {
 	return m_ID;
+}
+
+glm::mat4 Object::GetModelMatrix()
+{
+	return m_model;
 }
 
 glm::vec3 Object::getTransform() const

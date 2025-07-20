@@ -5,7 +5,7 @@
 class VBO
 {
 public:
-	inline VBO(float* vertices, uint32_t size)
+	inline VBO(const float* vertices, uint32_t size)
 	{
 		glGenBuffers(1, &m_ID); 
 

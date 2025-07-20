@@ -110,14 +110,14 @@ void Shader::handleErrors(GLuint type, const std::string& source, GLuint shaderI
 	}
 }
 
-void Shader::setUniformVar(const glm::mat4& uniform, const char* uniformName) const
+void Shader::setUniformMat4f(const glm::mat4& uniform, const char* uniformName) const
 {
 	GLuint location = glGetUniformLocation(ID, uniformName);
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(uniform));
 }
 
-void Shader::setTextureUniform()
+void Shader::setTextureUniform(uint32_t tex)
 {
 	uint32_t location = glGetUniformLocation(ID, "tex0");
-	glUniform1i(location, 0);
+	glUniform1i(location, tex);
 }

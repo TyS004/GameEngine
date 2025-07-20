@@ -6,6 +6,7 @@
 
 #include "Graphics/Buffer/VBO.h"
 #include "Graphics/Buffer/VAO.h"
+#include "Graphics/Buffer/Texture.h"
 
 class Render
 {
@@ -24,4 +25,24 @@ public:
 
 	void Init() override;
 	void Clear() override;
+
+	void ResizeViewport(uint32_t width, uint32_t height);
+	void RenderQuad(const Texture& frameTexture);
+
+private:
+	const float QUAD_BUFFER[24] = 
+	{
+		// positions   // texCoords
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,	
+
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
+		 1.0f,  1.0f,  1.0f, 1.0f
+	};
+
+	std::unique_ptr<VBO> QUAD_VBO;
+	std::unique_ptr<Shader> m_quadShader;
+	std::unique_ptr<VAO> m_VAO1;
 };
