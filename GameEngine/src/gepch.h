@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef _WIN32
+#ifdef GE_PLATFORM_WINDOWS
 	#include <Windows.h>
 #endif
 

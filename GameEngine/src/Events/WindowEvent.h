@@ -2,47 +2,50 @@
 
 #include "Event.h"
 
-class WindowCloseEvent : public Event
+namespace GameEngine
 {
-public:
-	WindowCloseEvent()
-		: m_type(EventType::WindowCloseEvent) {}
-
-	EventType getType() const override { return m_type; }
-	std::string toString() const override
+	class WindowCloseEvent : public Event
 	{
-		std::stringstream ss;
-		ss << "WindowCloseEvent";
-		return ss.str();
-	}
+	public:
+		WindowCloseEvent()
+			: m_type(EventType::WindowCloseEvent) {}
 
-	inline static EventType getStaticType() { return EventType::WindowCloseEvent; }
+		EventType getType() const override { return m_type; }
+		std::string toString() const override
+		{
+			std::stringstream ss;
+			ss << "WindowCloseEvent";
+			return ss.str();
+		}
 
-private:
-	EventType m_type;
-};
+		inline static EventType getStaticType() { return EventType::WindowCloseEvent; }
 
-class WindowResizeEvent : public Event
-{
-public:
-	WindowResizeEvent(int xOffset, int yOffset)
-		: m_type(EventType::WindowResizeEvent), m_xOffset(xOffset), m_yOffset(yOffset) {}
+	private:
+		EventType m_type;
+	};
 
-	EventType getType() const override { return m_type; }
-	std::string toString() const override
+	class WindowResizeEvent : public Event
 	{
-		std::stringstream ss;
-		ss << "WindowResizeEvent: (" << m_xOffset << ", " << m_yOffset << ")";
-		return ss.str();
-	}
+	public:
+		WindowResizeEvent(int xOffset, int yOffset)
+			: m_type(EventType::WindowResizeEvent), m_xOffset(xOffset), m_yOffset(yOffset) {}
 
-	inline static EventType getStaticType() { return EventType::WindowResizeEvent; }
+		EventType getType() const override { return m_type; }
+		std::string toString() const override
+		{
+			std::stringstream ss;
+			ss << "WindowResizeEvent: (" << m_xOffset << ", " << m_yOffset << ")";
+			return ss.str();
+		}
 
-	inline uint32_t getWidth() { return m_xOffset; }
-	inline uint32_t getHeight() { return m_yOffset; }
+		inline static EventType getStaticType() { return EventType::WindowResizeEvent; }
 
-private:
-	EventType m_type;
+		inline uint32_t getWidth() { return m_xOffset; }
+		inline uint32_t getHeight() { return m_yOffset; }
 
-	uint32_t m_xOffset, m_yOffset;
-};
+	private:
+		EventType m_type;
+
+		uint32_t m_xOffset, m_yOffset;
+	};
+}

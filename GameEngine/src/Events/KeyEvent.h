@@ -2,45 +2,48 @@
 
 #include "Event.h"
 
-class KeyPressedEvent : public Event
+namespace GameEngine
 {
-public:
-	KeyPressedEvent(int keycode, int repeats)
-		: m_type(EventType::KeyPressedEvent), m_keycode(keycode), m_repeats(repeats) {}
-
-	EventType getType() const override { return m_type; }
-	std::string toString() const override
+	class KeyPressedEvent : public Event
 	{
-		std::stringstream ss;
-		ss << "KeyPressedEvent: " << m_keycode;
-		return ss.str();
-	}
+	public:
+		KeyPressedEvent(int keycode, int repeats)
+			: m_type(EventType::KeyPressedEvent), m_keycode(keycode), m_repeats(repeats) {}
 
-	inline static EventType getStaticType() { return EventType::KeyPressedEvent; }
-	inline int getKeycode() { return m_keycode; }
+		EventType getType() const override { return m_type; }
+		std::string toString() const override
+		{
+			std::stringstream ss;
+			ss << "KeyPressedEvent: " << m_keycode;
+			return ss.str();
+		}
 
-private:
-	EventType m_type;
-	int m_keycode, m_repeats;
-};
+		inline static EventType getStaticType() { return EventType::KeyPressedEvent; }
+		inline int getKeycode() { return m_keycode; }
 
-class KeyReleasedEvent : public Event
-{
-public:
-	KeyReleasedEvent(int keycode)
-		: m_type(EventType::KeyReleasedEvent), m_keycode(keycode) {}
+	private:
+		EventType m_type;
+		int m_keycode, m_repeats;
+	};
 
-	EventType getType() const override { return m_type; }
-	std::string toString() const override
+	class KeyReleasedEvent : public Event
 	{
-		std::stringstream ss;
-		ss << "KeyReleasedEvent: " << m_keycode;
-		return ss.str();
-	}
+	public:
+		KeyReleasedEvent(int keycode)
+			: m_type(EventType::KeyReleasedEvent), m_keycode(keycode) {}
 
-	inline static EventType getStaticType() { return EventType::KeyReleasedEvent; }
+		EventType getType() const override { return m_type; }
+		std::string toString() const override
+		{
+			std::stringstream ss;
+			ss << "KeyReleasedEvent: " << m_keycode;
+			return ss.str();
+		}
 
-private:
-	EventType m_type;
-	int m_keycode;
-};
+		inline static EventType getStaticType() { return EventType::KeyReleasedEvent; }
+
+	private:
+		EventType m_type;
+		int m_keycode;
+	};
+}

@@ -1,6 +1,6 @@
 workspace "GameEngine"
 	architecture "x64"
-	startproject "GameEngine"
+	startproject "Sandbox"
 
 	configurations
 	{
@@ -21,12 +21,15 @@ include "GameEngine/vendor/GLFW"
 
 project "GameEngine"
 	location "GameEngine"
-	kind "ConsoleApp"
+	kind "SharedLib"
 	language "C++"
 	buildoptions { "/MP" }	
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	pchheader "gepch.h"
+	pchsource ("%{prj.name}/src/gepch.cpp")
 
 	files
 	{
@@ -51,17 +54,35 @@ project "GameEngine"
 		"%{IncludeDir.imgui}",
 		"%{IncludeDir.stb_image}"
 	}
-
+	
 	links
 	{
 		"GLFW",
 		"opengl32.lib"
 	}
 
+	postbuildcommands
+	{
+		("{MKDIR} ../bin/" .. outputdir .. "/Sandbox/"),
+		("{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox/")
+	}
+
+	filter "files:GameEngine/vendor/**.cpp"
+		flags { "NoPCH" }
+
+	filter "files:GameEngine/vendor/**.c"
+		flags { "NoPCH" }
+
 	filter "system:windows"
 		cppdialect "C++17"
 		staticruntime "On"
 		systemversion "latest"
+
+		defines
+		{
+			"GE_PLATFORM_WINDOWS",
+			"GE_BUILD_DLL"
+		}
 
 	filter "configurations:Debug"
 		defines "GE_DEBUG"
@@ -69,4 +90,60 @@ project "GameEngine"
 
 	filter "configurations:Release"
 		defines "GE_RELEASE"
+		optimize "On"
+
+
+project "Sandbox"
+	location "Sandbox"
+	kind "ConsoleApp"
+	language "C++"
+	buildoptions {"/utf-8"}
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	debugdir "../GameEngine/GameEngine"
+
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp",
+	}
+
+	includedirs
+	{
+		"%{prj.name}/src",
+		"GameEngine/src",
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.glad}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.imgui}",
+		"%{IncludeDir.stb_image}"
+	}
+
+	links
+	{
+		"GameEngine"
+	}
+
+	filter "system:windows"
+		cppdialect "C++17"
+		staticruntime "On"
+		systemversion "latest"
+
+		defines
+		{
+			"GE_PLATFORM_WINDOWS"
+		}
+
+	filter "configurations:Debug"
+		defines "GE_DEBUG"
+		symbols "On"
+
+	filter "configurations:Release"
+		defines "GE_RELEASE"
+		optimize "On"
+
+	filter "configurations:Dist"
+		defines "GE_DIST"
 		optimize "On"

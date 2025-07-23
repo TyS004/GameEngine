@@ -2,26 +2,29 @@
 
 #include "Logging/Log.h"
 
-class Shader
+namespace GameEngine
 {
-public:
-	GLuint ID;
-	
-	Shader();
-	Shader(const char* vertexFile, const char* fragmentFile);
+	class Shader
+	{
+	public:
+		GLuint ID;
 
-	std::string getFileContents(const char* fileName);
+		Shader();
+		Shader(const char* vertexFile, const char* fragmentFile);
 
-	void Activate();
-	void Delete();
+		std::string getFileContents(const char* fileName);
 
-	void CompileShaders();
-	void handleErrors(GLuint type, const std::string& source, GLuint shaderID);
+		void Activate();
+		void Delete();
 
-	void setUniformMat4f(const glm::mat4& uniform, const char* uniformName) const;
-	void setTextureUniform(uint32_t tex);
+		void CompileShaders();
+		void handleErrors(GLuint type, const std::string& source, GLuint shaderID);
 
-private:
-	std::string m_vertexSource, m_fragmentSource;
-	GLuint m_program;
-};
+		void setUniformMat4f(const glm::mat4& uniform, const char* uniformName) const;
+		void setTextureUniform(uint32_t tex);
+
+	private:
+		std::string m_vertexSource, m_fragmentSource;
+		GLuint m_program;
+	};
+}

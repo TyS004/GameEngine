@@ -5,24 +5,27 @@
 #include "Objects/Object.h"
 #include "UIElements/Viewport.h"
 
-class UI
+namespace GameEngine
 {
-public:
-	UI();
-	UI(Window& m_Window);
-	~UI();
+	class UI
+	{
+	public:
+		UI();
+		UI(Window& m_Window);
+		~UI();
 
-	void StartFrame();
-	void EndFrame();
-	void Update();
+		void StartFrame();
+		void EndFrame();
+		void Update();
 
-	Viewport* CreateViewport(const char* label);
+		Viewport* CreateViewport(const char* label);
 
-	Viewport* GetViewportByLabel(const std::string& label);
+		Viewport* GetViewportByLabel(const std::string& label);
 
-private:
-	const uint32_t STARTINGVIEWPORTS = 5;
+	private:
+		const uint32_t STARTINGVIEWPORTS = 5;
 
-	std::vector<Viewport*> m_viewports;
-	uint32_t m_currentViewport = 0;
-};
+		std::vector<Viewport*> m_viewports;
+		uint32_t m_currentViewport = 0;
+	};
+}

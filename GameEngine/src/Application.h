@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core.h"
+
 #include "Graphics/Window/Window.h"
 #include "Graphics/OpenGL/OpenGL.h"
 
@@ -24,52 +26,58 @@
 #include "Graphics/Buffer/FBO.h"
 #include "Graphics/Buffer/RBO.h"
 
-static const float START_WINDOW_WIDTH = 800.0f;
-static const float START_WINDOW_HEIGHT = 600.0f;
 
-class Application
+namespace GameEngine
 {
-public:
-	Application();
-	~Application();
+	static const float START_WINDOW_WIDTH = 800.0f;
+	static const float START_WINDOW_HEIGHT = 600.0f;
 
-	void Run();
-	void DrawObjects();
-	void UpdateWindows();
-	void OnEvent(Event& e);
+	class GE_API Application
+	{
+	public:
+		Application();
+		~Application();
 
-	bool OnWindowClose(WindowCloseEvent& e);
-	bool OnKeyPressed(KeyPressedEvent& e);
-	bool OnMouseButtonPressed(MousePressedEvent& e);
-	bool OnMouseMoved(MouseMovedEvent& e);
-	bool OnWindowResize(WindowResizeEvent& e);
-	
-	//UI / ImGUI
-	void OnImGuiSliderChanged(const UIElement& element);
-	void OnImGuiButtonPressed(const UIElement& element);
+		void Run();
+		void DrawObjects();
+		void UpdateWindows();
+		void OnEvent(Event& e);
 
-	//Editor Side (Need to Change Project Architecture)
-	//void CreateObject(float x, float y, float z);
+		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnKeyPressed(KeyPressedEvent& e);
+		bool OnMouseButtonPressed(MousePressedEvent& e);
+		bool OnMouseMoved(MouseMovedEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
 
-private:
-	bool m_Running = true;
+		//UI / ImGUI
+		void OnImGuiSliderChanged(const UIElement& element);
+		void OnImGuiButtonPressed(const UIElement& element);
 
-	uint32_t m_ActiveWindow = 0;
-	uint32_t m_SelectedObject = 0;
+		//Editor Side (Need to Change Project Architecture)
+		//void CreateObject(float x, float y, float z);
 
-	std::vector<Window*> m_Windows;
-	std::vector<Object*> m_Objects;
+	private:
+		bool m_Running = true;
 
-	OpenGL* m_Renderer;
-	Shader* m_Shader;
-	Camera* m_Camera;
-	UI* m_UI;
+		uint32_t m_ActiveWindow = 0;
+		uint32_t m_SelectedObject = 0;
 
-	std::unordered_map<std::string, float> m_SliderValues;
+		std::vector<Window*> m_Windows;
+		std::vector<Object*> m_Objects;
 
-	float m_lastXPos, m_lastYPos;
-	bool firstMouse = true;
+		OpenGL* m_Renderer;
+		Shader* m_Shader;
+		Camera* m_Camera;
+		UI* m_UI;
 
-	float m_viewportWidth = START_WINDOW_WIDTH;
-	float m_viewportHeight = START_WINDOW_HEIGHT;
-};
+		std::unordered_map<std::string, float> m_SliderValues;
+
+		float m_lastXPos, m_lastYPos;
+		bool firstMouse = true;
+
+		float m_viewportWidth = START_WINDOW_WIDTH;
+		float m_viewportHeight = START_WINDOW_HEIGHT;
+	};
+
+	Application* CreateApplication();
+}

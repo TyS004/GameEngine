@@ -2,22 +2,25 @@
 
 #include "gepch.h"
 
-class VBO
+namespace GameEngine
 {
-public:
-	inline VBO(const float* vertices, uint32_t size)
+	class GE_API VBO
 	{
-		glGenBuffers(1, &m_ID); 
+	public:
+		inline VBO(const float* vertices, uint32_t size)
+		{
+			glGenBuffers(1, &m_ID);
 
-		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
-		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	}
+			glBindBuffer(GL_ARRAY_BUFFER, m_ID);
+			glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
 
-	inline void Bind() const { glBindBuffer(GL_ARRAY_BUFFER, m_ID); }
-	inline void Unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
-	inline void Delete() { glDeleteBuffers(1, &m_ID); }
+		inline void Bind() const { glBindBuffer(GL_ARRAY_BUFFER, m_ID); }
+		inline void Unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
+		inline void Delete() { glDeleteBuffers(1, &m_ID); }
 
-private:
-	uint32_t m_ID;
-};
+	private:
+		uint32_t m_ID;
+	};
+}

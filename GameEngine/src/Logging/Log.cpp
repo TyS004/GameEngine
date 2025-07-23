@@ -1,21 +1,25 @@
 #include "gepch.h"
+
 #include "Log.h"
 
-HANDLE Log::m_ConsoleHandle;
-std::tm Log::m_timeNow;
-
-void Log::Init()
+namespace GameEngine
 {
-    Log::m_ConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-}
+    HANDLE Log::m_ConsoleHandle;
+    std::tm Log::m_timeNow;
 
-HANDLE Log::getConsoleHandle()
-{
-    return Log::m_ConsoleHandle;
-}
+    void Log::Init()
+    {
+        Log::m_ConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    }
 
-void Log::updateTimeNow() {
-    auto now = std::chrono::system_clock::now();
-    std::time_t t = std::chrono::system_clock::to_time_t(now);
-    localtime_s(&m_timeNow, &t);
+    HANDLE Log::getConsoleHandle()
+    {
+        return Log::m_ConsoleHandle;
+    }
+
+    void Log::updateTimeNow() {
+        auto now = std::chrono::system_clock::now();
+        std::time_t t = std::chrono::system_clock::to_time_t(now);
+        localtime_s(&m_timeNow, &t);
+    }
 }
