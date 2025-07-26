@@ -21,7 +21,7 @@ namespace GameEngine
 
 	void Viewport::Begin()
 	{
-		ImGui::Begin(m_label.c_str(), nullptr);
+		ImGui::Begin(m_label.c_str(), nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 	}
 
 	void Viewport::End()

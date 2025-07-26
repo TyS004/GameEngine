@@ -6,6 +6,12 @@
 
 namespace GameEngine
 {
+	std::vector<Window*> Application::m_Windows;
+	std::vector<Object*> Application::m_Objects;
+
+	uint32_t Application::m_ActiveWindow = 0;
+	uint32_t Application::m_SelectedObject = 0;
+
 	Application::Application()
 	{
 		Log::Init();
@@ -19,14 +25,14 @@ namespace GameEngine
 		m_lastXPos = 0.0f;
 		m_lastYPos = 0.0f;
 
-		m_Renderer = new OpenGL();
+		m_Renderer = new Renderer();
 
 		m_Shader = new Shader();
 		m_Shader->CompileShaders();
 
 		m_Camera = new Camera();
 
-		m_UI = new UI(*m_Windows[m_ActiveWindow]);
+		m_Editor = new Editor(m_Windows[m_ActiveWindow], m_Renderer);
 
 		m_Objects.reserve(5);
 	}
@@ -36,7 +42,7 @@ namespace GameEngine
 		delete m_Renderer;
 		delete m_Camera;
 		delete m_Shader;
-		delete m_UI;
+		delete m_Editor;
 
 		for (Object* obj : m_Objects)
 		{
@@ -46,64 +52,45 @@ namespace GameEngine
 
 	void Application::Run()
 	{
-		//IMGUI Element Creation
-		Viewport* mainViewport = m_UI->CreateViewport("Transform");
-		Viewport* sceneViewport = m_UI->CreateViewport("Viewport");
-
-		Slider* xPos = mainViewport->CreateSlider("X", BIND_EVENT_FN(OnImGuiSliderChanged));
-		Slider* yPos = mainViewport->CreateSlider("Y", BIND_EVENT_FN(OnImGuiSliderChanged));
-		Slider* zPos = mainViewport->CreateSlider("Z", BIND_EVENT_FN(OnImGuiSliderChanged));
-
-
-		Button* spawnButton = mainViewport->CreateButton("Spawn Object", BIND_EVENT_FN(OnImGuiButtonPressed));
-
-		Texture frameTexture(m_Windows[m_ActiveWindow]->GetWidth(), m_Windows[m_ActiveWindow]->GetHeight());
-		FBO FBO1(frameTexture, m_Windows[m_ActiveWindow]->GetWidth(), m_Windows[m_ActiveWindow]->GetHeight());
-		RBO RBO1(FBO1, m_Windows[m_ActiveWindow]->GetWidth(), m_Windows[m_ActiveWindow]->GetHeight());
-
+		//Needs to be in Sandbox as GameEngine::Renderer::LoadTexture("assets/textures/brick-3.png");
 		Texture blockTexture("assets/textures/brick-3.png");
 
-		//TEMP
+		//TEMP Object creation as GameEngine::Renderer::DrawCube();
 		m_Objects.push_back(new Object(0.0f, 0.0f, 0.0f));
 		glViewport(0, 0, START_WINDOW_WIDTH, START_WINDOW_HEIGHT);
 
 		//Main Loop
 		while (m_Running)
 		{
+
+			//ECS for(Mesh* mesh : Meshes)
+			//	  {
+			//	     Render(Mesh)
+			//    }
+			// 
+
 			//1st Pass Rendering Objects to FBO
-			FBO1.Bind();
+			m_Renderer->GetFBO().Bind();
 			blockTexture.Bind();
 
 			m_Shader->Activate();
 			m_Shader->setTextureUniform(0);
-			m_Renderer->Clear();
+			m_Renderer->Clear(0.0f, 0.0f, 0.0f, 1.0f);
 			m_Camera->Update(*m_Windows[m_ActiveWindow], m_viewportWidth, m_viewportHeight);
 			m_Shader->setUniformMat4f(m_Camera->GetViewMatrix(), "view");
 			m_Shader->setUniformMat4f(m_Camera->GetProjectionMatrix(), "projection");
 			DrawObjects();
 
 			blockTexture.Unbind();
-			FBO1.Unbind();
+			m_Renderer->GetFBO().Unbind();
 
-			////2nd Pass FBO -> Quad
-			m_Renderer->Clear();
-			//m_Renderer->RenderQuad(frameTexture);
+			////Upload Texture to ImGui Viewport 
+			m_Renderer->Clear(0.5f, 0.5f, 0.5f, 1.0f);
 
 			//ImGui Render Loop
-			m_UI->StartFrame();
-			m_UI->Update();
-
-			ImVec2 wsize = ImGui::GetWindowSize();
-			ImVec2 pos = ImGui::GetCursorScreenPos();
-
-			auto viewportSize = ImGui::GetContentRegionAvail();
-			m_viewportWidth = viewportSize.x;
-			m_viewportHeight = viewportSize.y;
-
-			ImGui::SetNextWindowSize(ImVec2(m_Windows[m_ActiveWindow]->GetWidth(), m_Windows[m_ActiveWindow]->GetHeight()));
-			ImGui::Image(frameTexture.getID(), ImVec2(viewportSize.x, viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
-
-			m_UI->EndFrame();
+			m_Editor->StartFrame();
+			m_Editor->Update();
+			m_Editor->EndFrame();
 
 			UpdateWindows();
 		}
@@ -192,39 +179,8 @@ namespace GameEngine
 		int width, height;
 		glfwGetWindowSize(m_Windows[m_ActiveWindow]->getWindow(), &width, &height);
 
-		INFO("Window Resized");
-		INFO(std::to_string(width) + ", " + std::to_string(height));
+		m_Renderer->ResizeViewport(m_Editor->GetViewportSize().x, m_Editor->GetViewportSize().y);
 
 		return true;
-	}
-
-	void Application::OnImGuiSliderChanged(const UIElement& element)
-	{
-		const Slider& slider = dynamic_cast<const Slider&>(element);
-		m_SliderValues[slider.GetName()] = slider.GetData();
-
-		Object* currentObj = m_Objects[m_SelectedObject];
-
-		if (slider.GetName() == "X")
-		{
-			currentObj->Translate(slider.GetData(), currentObj->getTransform().y, currentObj->getTransform().z);
-			INFO(slider.GetData());
-		}
-		else if (slider.GetName() == "Y")
-		{
-			currentObj->Translate(currentObj->getTransform().x, slider.GetData(), currentObj->getTransform().z);
-			INFO(slider.GetData());
-		}
-		else if (slider.GetName() == "Z")
-		{
-			currentObj->Translate(currentObj->getTransform().x, currentObj->getTransform().y, slider.GetData());
-			INFO(slider.GetData());
-		}
-	}
-
-	void Application::OnImGuiButtonPressed(const UIElement& element)
-	{
-		const Button& button = dynamic_cast<const Button&>(element);
-		m_Objects.emplace_back(new Object(m_SliderValues["X"], m_SliderValues["Y"], m_SliderValues["Z"]));
 	}
 }

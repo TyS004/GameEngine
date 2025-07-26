@@ -56,7 +56,11 @@ namespace GameEngine
 		inline void Unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
 		inline void Delete() const { glDeleteTextures(1, &m_ID); }
 
-		inline uint32_t getID() const { return m_ID; }
+		inline uint32_t GetID() const { return m_ID; }
+
+		inline int GetWidth() const { return m_width; }
+		inline int GetHeight() const { return m_height; }
+		inline int GetNumChannels() const { return m_numChannels; }
 
 	private:
 		uint32_t m_ID;

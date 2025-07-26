@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef GE_PLATFORM_WINDOWS
+
 extern GameEngine::Application* GameEngine::CreateApplication();
 
 int main(int argc, char* argv)
@@ -9,4 +10,5 @@ int main(int argc, char* argv)
 	app->Run();
 	delete app;
 }
+
 #endif

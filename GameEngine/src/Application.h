@@ -3,7 +3,7 @@
 #include "Core.h"
 
 #include "Graphics/Window/Window.h"
-#include "Graphics/OpenGL/OpenGL.h"
+#include "Graphics/Renderer/Renderer.h"
 
 #include "Logging/Log.h"
 
@@ -19,18 +19,17 @@
 
 #include "Math/Math.h"
 
-#include "UI/UIElements/UIElement.h"
-#include "UI/UI.h"
+#include "Editor/UIElements/UIElement.h"
+#include "Editor/Editor.h"
 
 #include "Graphics/Buffer/Texture.h"
 #include "Graphics/Buffer/FBO.h"
 #include "Graphics/Buffer/RBO.h"
 
-
 namespace GameEngine
 {
-	static const float START_WINDOW_WIDTH = 800.0f;
-	static const float START_WINDOW_HEIGHT = 600.0f;
+	static const float START_WINDOW_WIDTH = 1980.0f;
+	static const float START_WINDOW_HEIGHT = 1080.0f;
 
 	class GE_API Application
 	{
@@ -38,7 +37,7 @@ namespace GameEngine
 		Application();
 		~Application();
 
-		void Run();
+		virtual void Run();
 		void DrawObjects();
 		void UpdateWindows();
 		void OnEvent(Event& e);
@@ -49,26 +48,19 @@ namespace GameEngine
 		bool OnMouseMoved(MouseMovedEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 
-		//UI / ImGUI
-		void OnImGuiSliderChanged(const UIElement& element);
-		void OnImGuiButtonPressed(const UIElement& element);
+		static std::vector<Window*> m_Windows;
+		static std::vector<Object*> m_Objects;
 
-		//Editor Side (Need to Change Project Architecture)
-		//void CreateObject(float x, float y, float z);
+		static uint32_t m_ActiveWindow;
+		static uint32_t m_SelectedObject;
 
 	private:
 		bool m_Running = true;
 
-		uint32_t m_ActiveWindow = 0;
-		uint32_t m_SelectedObject = 0;
-
-		std::vector<Window*> m_Windows;
-		std::vector<Object*> m_Objects;
-
-		OpenGL* m_Renderer;
+		Renderer* m_Renderer;
 		Shader* m_Shader;
 		Camera* m_Camera;
-		UI* m_UI;
+		Editor* m_Editor;
 
 		std::unordered_map<std::string, float> m_SliderValues;
 

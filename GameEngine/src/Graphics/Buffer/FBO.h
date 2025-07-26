@@ -9,24 +9,27 @@ namespace GameEngine
 	class GE_API FBO
 	{
 	public:
-		inline FBO(const Texture& texture, uint32_t width, uint32_t height)
+		inline FBO(const Texture& texture)
 		{
 			glGenFramebuffers(1, &m_ID);
 			glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
 
 			m_texture = &texture;
-			m_width = width;
-			m_height = height;
+			m_width = texture.GetWidth();
+			m_height = texture.GetHeight();
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture.getID(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture.GetID(), 0);
 			glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
-			glViewport(0, 0, width, height);
+			glViewport(0, 0, m_width, m_height);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
 
-		inline uint32_t getID() const { return m_ID; }
+		inline uint32_t GetID() const { return m_ID; }
+
+		inline int GetWidth() const { return m_width; }
+		inline int GetHeight() const { return m_height; }
 
 		inline void Bind() const { glBindFramebuffer(GL_FRAMEBUFFER, m_ID); }
 		inline void Unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
@@ -37,7 +40,7 @@ namespace GameEngine
 
 			INFO("Checking FBO:");
 			INFO("FBO ID: " + std::to_string(m_ID));
-			INFO("Texture ID: " + std::to_string(m_texture->getID()));
+			INFO("Texture ID: " + std::to_string(m_texture->GetID()));
 			INFO("Window size: " + std::to_string(m_width) + "x" + std::to_string(m_height));
 
 			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

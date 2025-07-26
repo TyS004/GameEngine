@@ -32,9 +32,9 @@ namespace GameEngine
 
 		void OnUpdate();
 
-		inline unsigned int GetWidth() { return m_Data.width; }
-		inline unsigned int GetHeight() { return m_Data.height; }
-		inline GLFWwindow* getWindow() { return m_Window; }
+		inline unsigned int GetWidth() const { return m_Data.width; }
+		inline unsigned int GetHeight() const { return m_Data.height; }
+		inline GLFWwindow* getWindow() const { return m_Window; }
 
 		inline void SetEventCallback(const EventCallbackFn& callback) { m_Data.EventCallback = callback; }
 		void SetVSync(bool enabled);
