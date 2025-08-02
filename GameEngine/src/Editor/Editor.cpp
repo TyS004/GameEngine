@@ -32,23 +32,22 @@ namespace GameEngine
 
 		ImGui::StyleColorsDark();
 
-		m_viewports.reserve(STARTINGVIEWPORTS);
-
 		CreateUIElements();
 	}
 
+	//OLD
 	void Editor::CreateUIElements()
 	{
-		Viewport* entitiesViewport = CreateViewport("Entities");
-		Viewport* fileManagerViewport = CreateViewport("File Manager");
-		Viewport* mainViewport = CreateViewport("Properties");
-		Viewport* sceneViewport = CreateViewport("Viewport");
+		m_entitiesViewport = new Viewport("Entities");
+		m_fileManagerViewport = new Viewport("File Manager");
+		m_mainViewport = new Viewport("Properties");
+		m_sceneViewport = new Viewport("Viewport");
 
-		Slider* xPos = mainViewport->CreateSlider("X", BIND_UIEVENT_FN(OnImGuiSliderChanged));
-		Slider* yPos = mainViewport->CreateSlider("Y", BIND_UIEVENT_FN(OnImGuiSliderChanged));
-		Slider* zPos = mainViewport->CreateSlider("Z", BIND_UIEVENT_FN(OnImGuiSliderChanged));
+		m_xPos = m_mainViewport->CreateSlider("X", BIND_UIEVENT_FN(OnImGuiSliderChanged));
+		m_yPos = m_mainViewport->CreateSlider("Y", BIND_UIEVENT_FN(OnImGuiSliderChanged));
+		m_zPos = m_mainViewport->CreateSlider("Z", BIND_UIEVENT_FN(OnImGuiSliderChanged));
 
-		Button* spawnButton = mainViewport->CreateButton("Spawn Object", BIND_UIEVENT_FN(OnImGuiButtonPressed));
+		m_spawnButton = m_mainViewport->CreateButton("Spawn Object", BIND_UIEVENT_FN(OnImGuiButtonPressed));
 	}
 
 	Editor::~Editor()
@@ -72,14 +71,6 @@ namespace GameEngine
 
 	void Editor::EndFrame()
 	{
-		if (!m_viewports.empty())
-		{
-			for (Viewport* viewport : m_viewports)
-			{
-				viewport->End();
-			}
-		}
-
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -91,42 +82,47 @@ namespace GameEngine
 		}
 	}
 
-	Viewport* Editor::CreateViewport(const char* label)
-	{
-		Viewport* viewport = new Viewport(label);
-		m_viewports.emplace_back(viewport);
-		return viewport;
-	}
-
-	Viewport* Editor::GetViewportByLabel(const std::string& label)
-	{
-		for (Viewport* viewport : m_viewports)
-		{
-			if (viewport->GetLabel() == label)
-			{
-				return viewport;
-			}
-		}
-		return nullptr;
-	}
-
 	void Editor::Update()
 	{
-		for (Viewport* viewport : m_viewports)
+		//Start Frame
+		StartFrame();
+		
+		if (m_entitiesViewport->Begin())
 		{
-			viewport->Update();
+			m_entitiesViewport->Update();
 		}
+		m_entitiesViewport->End();
 
-		ImVec2 temp = m_viewportSize;
-		m_viewportSize = ImGui::GetContentRegionAvail();
-		if ((temp.x != m_viewportSize.x) || (temp.y != m_viewportSize.y))
+		if (m_fileManagerViewport->Begin())
 		{
-			OnImGuiViewportResized();
+			m_fileManagerViewport->Update();
 		}
+		m_fileManagerViewport->End();
 
-		//ImGui Window Doesnt Fully take up the window space for some reason so need extra buffer
-		ImGui::SetNextWindowSize(ImVec2(m_currentWindow->GetWidth() + IMGUI_WINDOW_WIDTH_BUFFER, m_currentWindow->GetHeight()));
-		ImGui::Image(m_currentRenderer->GetFBOTexture().GetID(), ImVec2(m_viewportSize.x, m_viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+		if (m_mainViewport->Begin())
+		{
+			m_mainViewport->Update();
+		}
+		m_mainViewport->End();
+
+		if (m_sceneViewport->Begin())
+		{
+			ImVec2 temp = m_viewportSize;
+			m_viewportSize = ImGui::GetContentRegionAvail();
+			if ((temp.x != m_viewportSize.x) || (temp.y != m_viewportSize.y))
+			{
+				OnImGuiViewportResized();
+			}
+
+			//ImGui Window Doesnt Fully take up the window space for some reason so need extra buffer
+			ImGui::SetNextWindowSize(ImVec2(m_currentWindow->GetWidth() + IMGUI_WINDOW_WIDTH_BUFFER, m_currentWindow->GetHeight()));
+			ImGui::SetNextWindowPos(ImVec2(0, 0));
+			ImGui::Image(m_currentRenderer->GetFBOTexture().GetID(), ImVec2(m_viewportSize.x, m_viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+		}
+		m_sceneViewport->End();
+
+		//End Frame
+		EndFrame();
 	}
 
 	void Editor::OnImGuiSliderChanged(const UIElement& element)

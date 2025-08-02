@@ -26,6 +26,8 @@
 #include "Graphics/Buffer/FBO.h"
 #include "Graphics/Buffer/RBO.h"
 
+#include "Scene/Scene.h"
+
 namespace GameEngine
 {
 	static const float START_WINDOW_WIDTH = 1980.0f;
@@ -61,6 +63,7 @@ namespace GameEngine
 		Shader* m_Shader;
 		Camera* m_Camera;
 		Editor* m_Editor;
+		Scene* m_ActiveScene;
 
 		std::unordered_map<std::string, float> m_SliderValues;
 

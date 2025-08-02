@@ -7,6 +7,8 @@ namespace GameEngine
 	{
 		m_vertexSource = getFileContents("assets/shaders/default.vert");
 		m_fragmentSource = getFileContents("assets/shaders/default.frag");
+
+		CompileShaders();
 	}
 
 	Shader::Shader(const char* vertexFileName, const char* fragmentFileName)
@@ -17,7 +19,6 @@ namespace GameEngine
 		TRACE(std::filesystem::current_path());
 
 		CompileShaders();
-		Activate();
 	}
 
 	std::string Shader::getFileContents(const char* fileName)

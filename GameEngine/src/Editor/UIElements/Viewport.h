@@ -10,11 +10,14 @@ namespace GameEngine
 		Viewport(const std::string& label);
 		~Viewport();
 
-		void Begin();
+		bool Begin();
 		void End();
 
 		Slider* CreateSlider(const std::string& label, const UIEventFn& callback);
 		Button* CreateButton(const std::string& label, const UIEventFn& callback);
+		void InsertImage();
+
+		void AddText();
 
 		UIElement* GetElementByName(const std::string& name) const;
 

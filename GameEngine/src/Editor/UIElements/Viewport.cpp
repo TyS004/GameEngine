@@ -19,9 +19,9 @@ namespace GameEngine
 
 	}
 
-	void Viewport::Begin()
+	bool Viewport::Begin()
 	{
-		ImGui::Begin(m_label.c_str(), nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		return ImGui::Begin(m_label.c_str(), nullptr);
 	}
 
 	void Viewport::End()
@@ -65,10 +65,9 @@ namespace GameEngine
 
 	void Viewport::Update()
 	{
-		Begin();
 		for (UIElement* element : m_elements)
 		{
 			element->Update();
-		}
+		}	
 	}
 }

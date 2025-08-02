@@ -21,9 +21,6 @@ namespace GameEngine
 		void EndFrame();
 		void Update();
 
-		Viewport* CreateViewport(const char* label);
-		Viewport* GetViewportByLabel(const std::string& label);
-
 		void OnImGuiSliderChanged(const UIElement& element);
 		void OnImGuiButtonPressed(const UIElement& element);
 		void OnImGuiViewportResized();
@@ -32,13 +29,10 @@ namespace GameEngine
 
 	private:
 		const uint32_t STARTINGVIEWPORTS = 5;
-		const float UI_FONT_SIZE = 22.0f;
 		const uint32_t IMGUI_WINDOW_WIDTH_BUFFER = 5;
+		const float UI_FONT_SIZE = 22.0f;
 
 		ImGuiStyle m_UIStyle;
-
-		std::vector<Viewport*> m_viewports;
-		uint32_t m_currentViewport = 0;
 
 		std::unordered_map<std::string, float> m_SliderValues;
 		
@@ -46,6 +40,17 @@ namespace GameEngine
 
 		Window* m_currentWindow;
 		Renderer* m_currentRenderer;
+
+		Viewport* m_entitiesViewport;
+		Viewport* m_fileManagerViewport;
+		Viewport* m_mainViewport;
+		Viewport* m_sceneViewport;
+
+		Slider* m_xPos;
+		Slider* m_yPos;
+		Slider* m_zPos;
+
+		Button* m_spawnButton;
 
 		bool m_firstResize = true;
 	};

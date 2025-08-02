@@ -33,6 +33,7 @@ namespace GameEngine
 		m_quadVBO = std::make_unique<VBO>(QUAD_BUFFER, sizeof(QUAD_BUFFER));
 		m_VAO = std::make_unique<VAO>();
 		m_quadShader = std::make_unique<Shader>("assets/shaders/quad.vert", "assets/shaders/quad.frag");
+		m_quadShader->Activate();
 
 		m_VAO->Bind();
 		m_quadVBO->Bind();
@@ -45,6 +46,10 @@ namespace GameEngine
 		m_FBOTexture = std::make_unique<Texture>(START_WINDOW_WIDTH, START_WINDOW_HEIGHT);
 		m_FBO = std::make_unique<FBO>(*m_FBOTexture);
 		m_RBO = std::make_unique<RBO>(*m_FBO);
+
+		//Default Shader Init
+		//m_defaultShader = new Shader();
+		//m_defaultShader->CompileShaders();
 	}
 
 	void Renderer::Clear(float r, float g, float b, float a)
@@ -70,6 +75,7 @@ namespace GameEngine
 		}
 	}
 
+	//Not in Use may get used in Future
 	void Renderer::RenderQuad(const Texture& frameTexture)
 	{
 		frameTexture.Bind();
@@ -90,6 +96,27 @@ namespace GameEngine
 		m_FBOTexture = std::make_unique<Texture>(width, height);
 		m_FBO = std::make_unique<FBO>(*m_FBOTexture);
 		m_RBO = std::make_unique<RBO>(*m_FBO);
+	}
+
+	void Renderer::SubmitMesh(const MeshComponet& cubeRenderer, const TransformComponet& transform, const Shader& shader)
+	{
+		shader.setUniformMat4f(transform.Transform, "model");
+
+		VAO VAO1;
+		VBO VBO1(cubeRenderer.m_buffer, sizeof(cubeRenderer.m_buffer));
+		VAO1.Bind();
+		VBO1.Bind();
+
+		VAO1.LinkAttribute(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), 0);
+		VAO1.LinkAttribute(VBO1, 1, 3, GL_FLOAT, 8 * sizeof(float), 3 * sizeof(float));
+		VAO1.LinkAttribute(VBO1, 2, 2, GL_FLOAT, 8 * sizeof(float), 6 * sizeof(float));
+
+		VAO1.Unbind();
+		VBO1.Unbind();
+
+		VAO1.Bind();
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		VAO1.Unbind();
 	}
 
 	FBO Renderer::GetFBO() const

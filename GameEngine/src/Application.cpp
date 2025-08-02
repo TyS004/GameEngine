@@ -1,6 +1,7 @@
 #include "gepch.h"
 
 #include "Application.h"
+#include "ECS/Entity.h"
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
@@ -26,14 +27,18 @@ namespace GameEngine
 		m_lastYPos = 0.0f;
 
 		m_Renderer = new Renderer();
-
 		m_Shader = new Shader();
-		m_Shader->CompileShaders();
-
 		m_Camera = new Camera();
-
 		m_Editor = new Editor(m_Windows[m_ActiveWindow], m_Renderer);
+		m_ActiveScene = new Scene();
 
+		Entity newEntity(m_ActiveScene);
+		newEntity.AddTagComponet("Cube Entity");
+
+		INFO(m_ActiveScene->GetTags()[0].Tag);
+
+		INFO(newEntity.GetID());
+		
 		m_Objects.reserve(5);
 	}
 
@@ -87,10 +92,13 @@ namespace GameEngine
 			////Upload Texture to ImGui Viewport 
 			m_Renderer->Clear(0.5f, 0.5f, 0.5f, 1.0f);
 
-			//ImGui Render Loop
-			m_Editor->StartFrame();
+			//ImGui Render Loop 
+
+			/*m_Editor->StartFrame();
 			m_Editor->Update();
-			m_Editor->EndFrame();
+			m_Editor->EndFrame();*/
+			m_Editor->Update();
+			//m_Editor->OnImGuiRender();
 
 			UpdateWindows();
 		}
@@ -169,7 +177,7 @@ namespace GameEngine
 		{
 			m_Camera->ProcessMouseMovement(xOffset, yOffset);
 		}
-
+		
 		//TRACE(std::to_string(e.getX()) + " " + std::to_string(e.getY()));
 		return true;
 	}

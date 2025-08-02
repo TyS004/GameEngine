@@ -1,22 +1,25 @@
 #pragma once
 
-#include "gepch.h"
+#include "Scene/Scene.h"
 
 namespace GameEngine
 {
-	struct Entity
-	{
-		uint32_t m_ID;
-	};
+    class Entity
+    {
+    public:
+        Entity(Scene* scene);
+        ~Entity();
 
-	struct TransformComponet
-	{
-		float x, y, z;
-		float yaw, pitch, roll;
-	};
+        void AddTransformComponet();
+        void AddMeshComponet();
+        void AddTagComponet(const std::string& tag);
 
-	struct MeshComponet
-	{
+        uint32_t GetID();
 
-	};
+        static uint32_t Entity_ID;
+
+    private:
+        uint32_t m_ID;
+        Scene* m_Scene;
+    };
 }

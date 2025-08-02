@@ -10,6 +10,8 @@
 #include "Graphics/Buffer/FBO.h"
 #include "Graphics/Buffer/RBO.h"
 
+#include "ECS/Componets.h"
+
 namespace GameEngine
 {
 	class Renderer
@@ -24,6 +26,8 @@ namespace GameEngine
 		void ResizeViewport(uint32_t width, uint32_t height);
 		void RenderQuad(const Texture& frameTexture);
 		void UpdateFrameBufferTexture(float width, float height);
+
+		void SubmitMesh(const MeshComponet& mesh, const TransformComponet& transform, const Shader& shader);
 
 		FBO GetFBO() const;
 		Texture GetFBOTexture() const;
@@ -49,5 +53,7 @@ namespace GameEngine
 		std::unique_ptr<Texture> m_FBOTexture;
 		std::unique_ptr<FBO> m_FBO;
 		std::unique_ptr<RBO> m_RBO;
+
+		//Shader* m_defaultShader;
 	};
 }
